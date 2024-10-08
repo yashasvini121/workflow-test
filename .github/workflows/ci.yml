@@ -32,7 +32,7 @@ jobs:
     - name: Validate dependencies with pip-check
       run: |
         pip install pip-check
-        pip-check --verbose
+        pip-check
       continue-on-error: false  # Fail the workflow if dependencies are invalid
 
     - name: Test Streamlit App
