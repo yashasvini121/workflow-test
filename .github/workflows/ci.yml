@@ -56,10 +56,3 @@ jobs:
         curl --retry 5 --retry-delay 5 http://localhost:8501
       env:
         STREAMLIT_SERVER_HEADLESS: true
-
-    - name: Upload Test Results
-      if: always()
-      uses: actions/upload-artifact@v3
-      with:
-        name: test-results
-        path: test-reports/  # Ensure your tests output reports here
