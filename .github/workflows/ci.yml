@@ -1,6 +1,6 @@
 name: CI - Validate PR
 
-# Trigger the workflow on pull requests
+# Trigger the workflow on pull requests to the main branch
 on:
   pull_request:
     branches: [ main ]  # Replace 'main' with your default branch if different
@@ -28,19 +28,32 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
 
-    - name: Validate requirements.txt
+    - name: Validate dependencies with pip-check
       run: |
-        # Optionally, you can add checks to ensure requirements.txt is up-to-date
-        # For example, check for unused packages or missing ones
-        # This requires additional tooling like pip-check or similar
-        echo "Requirements are installed successfully."
+        pip install pip-check
+        pip-check --verbose
+      continue-on-error: false  # Fail the workflow if dependencies are invalid
 
-    - name: Run Tests
+    - name: Lint code with flake8
       run: |
-        # Replace the following with your test commands
-        # For Streamlit apps, you might run `streamlit run your_app.py --server.headless true`
-        # Here, we'll just perform a simple check to ensure the app runs without errors
-        streamlit run your_app.py --server.headless true --script.test True
+        pip install flake8
+        flake8 workflow-test/ app.py  # Adjust paths as necessary
+      continue-on-error: false
+
+    - name: Run Tests with pytest
+      run: |
+        pip install pytest
+        pytest  # Ensure you have test files (e.g., tests/) in your repository
+      continue-on-error: false
+
+    - name: Test Streamlit App
+      run: |
+        pip install streamlit
+        streamlit run workflow-test/app.py --server.headless true --browser.gatherUsageStats false &
+        sleep 10  # Wait for the app to start
+        # Optionally, you can add commands to perform HTTP requests to the app to ensure it's running
+        # For example, using curl to check if the app is responding
+        curl --retry 5 --retry-delay 5 http://localhost:8501
       env:
         STREAMLIT_SERVER_HEADLESS: true
 
@@ -49,4 +62,4 @@ jobs:
       uses: actions/upload-artifact@v3
       with:
         name: test-results
-        path: path/to/test-results  # Modify as needed
+        path: test-reports/  # Ensure your tests output reports here
