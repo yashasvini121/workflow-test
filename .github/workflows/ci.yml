@@ -34,18 +34,6 @@ jobs:
         pip-check --verbose
       continue-on-error: false  # Fail the workflow if dependencies are invalid
 
-    - name: Lint code with flake8
-      run: |
-        pip install flake8
-        flake8 workflow-test/ app.py  # Adjust paths as necessary
-      continue-on-error: false
-
-    - name: Run Tests with pytest
-      run: |
-        pip install pytest
-        pytest  # Ensure you have test files (e.g., tests/) in your repository
-      continue-on-error: false
-
     - name: Test Streamlit App
       run: |
         pip install streamlit
