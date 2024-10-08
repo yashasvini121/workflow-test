@@ -1,0 +1,52 @@
+name: CI - Validate PR
+
+# Trigger the workflow on pull requests
+on:
+  pull_request:
+    branches: [ main ]  # Replace 'main' with your default branch if different
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        python-version: [3.8, 3.9, 3.10]  # Specify Python versions you support
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+
+    - name: Validate requirements.txt
+      run: |
+        # Optionally, you can add checks to ensure requirements.txt is up-to-date
+        # For example, check for unused packages or missing ones
+        # This requires additional tooling like pip-check or similar
+        echo "Requirements are installed successfully."
+
+    - name: Run Tests
+      run: |
+        # Replace the following with your test commands
+        # For Streamlit apps, you might run `streamlit run your_app.py --server.headless true`
+        # Here, we'll just perform a simple check to ensure the app runs without errors
+        streamlit run your_app.py --server.headless true --script.test True
+      env:
+        STREAMLIT_SERVER_HEADLESS: true
+
+    - name: Upload Test Results
+      if: always()
+      uses: actions/upload-artifact@v3
+      with:
+        name: test-results
+        path: path/to/test-results  # Modify as needed
