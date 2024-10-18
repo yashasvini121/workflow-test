@@ -18,13 +18,19 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v3
 
+    - name: Install Ubuntu packages
+      run: |
+        sudo apt-get update
+        sudo xargs -a packages.txt apt-get install -y
+      shell: bash
+
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v4
       with:
         python-version: ${{ matrix.python-version }}
         architecture: 'x64'  # Ensure 64-bit architecture
 
-    - name: Install dependencies
+    - name: Install Python dependencies
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements.txt
